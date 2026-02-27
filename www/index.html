@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tebak Angka - Simple & Fun</title>
+    
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 350px;
+            transition: transform 0.3s ease;
+        }
+
+        h2 { color: #4a148c; margin-bottom: 10px; }
+        
+        p { font-size: 0.9rem; color: #666; }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .heart { color: #e91e63; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus { border-color: #764ba2; }
+
+        button {
+            width: 100%;
+            background: #764ba2;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover { background: #5a368c; }
+
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        .message {
+            margin-top: 20px;
+            min-height: 50px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .reset-btn {
+            background: #f44336;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="gameBox">
+    <h2>Tebak Angka 🎯</h2>
+    <p>Aku memikirkan angka antara <b>1 - 100</b>. Bisa tebak?</p>
+
+    <div class="stats">
+        <span>Kesempatan: <span id="lives" class="heart">5</span> ❤️</span>
+    </div>
+
+    <input type="number" id="guessInput" placeholder="Masukkan angka..." min="1" max="100">
+    
+    <button id="btnGuess" onclick="checkGuess()">TEBAK SEKARANG</button>
+    <button id="btnReset" class="reset-btn" onclick="resetGame()">MAIN LAGI</button>
+
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+    let targetNumber;
+    let lives;
+    const input = document.getElementById('guessInput');
+    const message = document.getElementById('message');
+    const livesDisplay = document.getElementById('lives');
+    const btnGuess = document.getElementById('btnGuess');
+    const btnReset = document.getElementById('btnReset');
+
+    // Inisialisasi Game
+    function initGame() {
+        targetNumber = Math.floor(Math.random() * 100) + 1;
+        lives = 5;
+        livesDisplay.textContent = lives;
+        message.textContent = "Ayo mulai menebak!";
+        message.style.color = "#333";
+        input.disabled = false;
+        btnGuess.style.display = "block";
+        btnReset.style.display = "none";
+        input.value = "";
+        input.focus();
+    }
+
+    function checkGuess() {
+        const guess = parseInt(input.value);
+
+        // Validasi input
+        if (isNaN(guess) || guess < 1 || guess > 100) {
+            message.textContent = "⚠️ Masukkan angka yang bener (1-100)!";
+            message.style.color = "orange";
+            return;
+        }
+
+        if (guess === targetNumber) {
+            // Jika Benar
+            message.innerHTML = "🎉 MANTAP!<br>Angkanya beneran <b>" + targetNumber + "</b>!";
+            message.style.color = "#2e7d32";
+            gameOver(true);
+        } else {
+            // Jika Salah
+            lives--;
+            livesDisplay.textContent = lives;
+            
+            if (lives === 0) {
+                message.innerHTML = "💀 GAME OVER!<br>Angka rahasianya adalah <b>" + targetNumber + "</b>";
+                message.style.color = "#c62828";
+                gameOver(false);
+            } else {
+                let hint = guess > targetNumber ? "Terlalu KETINGGIAN!" : "Terlalu KERENDAHAN!";
+                message.textContent = "❌ " + hint;
+                message.style.color = "#ef6c00";
+            }
+        }
+        input.value = "";
+        input.focus();
+    }
+
+    function gameOver(isWin) {
+        input.disabled = true;
+        btnGuess.style.display = "none";
+        btnReset.style.display = "block";
+        if(isWin) {
+            // Efek getar sederhana jika menang
+            document.getElementById('gameBox').style.transform = "scale(1.05)";
+        }
+    }
+
+    function resetGame() {
+        document.getElementById('gameBox').style.transform = "scale(1)";
+        initGame();
+    }
+
+    // Biar bisa tekan "Enter" untuk tebak
+    input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            checkGuess();
+        }
+    });
+
+    // Jalankan game saat web dibuka
+    initGame();
+</script>
+
+</body>
+</html>
